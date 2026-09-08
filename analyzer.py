@@ -56,7 +56,12 @@ home_won = df[df["FTR"] == "H"].groupby("HomeTeam").size()
 home_win_pct = (home_won / home_played * 100).round(1).sort_values(ascending=False).head(10)
 print(home_win_pct)
 
+import matplotlib
+matplotlib.use("Agg")   # write files, do not open windows
 import matplotlib.pyplot as plt
+import os
+
+os.makedirs("assets", exist_ok=True)
 
 # --- CHART 1: El Clasico Record ---
 clasico_data = ["Barcelona Wins", "Real Madrid Wins", "Draws"]
@@ -67,8 +72,7 @@ plt.figure(figsize=(8, 5))
 plt.bar(clasico_data, clasico_values, color=colors)
 plt.title("El Clasico Record (1995-2025)", fontsize=14)
 plt.ylabel("Number of Matches")
-plt.savefig("clasico_record.png")
-plt.show()
+plt.savefig("assets/clasico_record.png")
 print("Chart 1 saved!")
 
 # --- CHART 2: Barcelona Goals Per Season (Top 10) ---
@@ -77,8 +81,7 @@ goals_per_season.sort_values().plot(kind="barh", color="#A50044")
 plt.title("Barcelona Best Scoring Seasons", fontsize=14)
 plt.xlabel("Total Goals")
 plt.tight_layout()
-plt.savefig("barca_goals_per_season.png")
-plt.show()
+plt.savefig("assets/barca_goals_per_season.png")
 print("Chart 2 saved!")
 
 # --- CHART 3: Top 10 Home Win % ---
@@ -87,6 +90,5 @@ home_win_pct.sort_values().plot(kind="barh", color="#004D98")
 plt.title("Top 10 Teams by Home Win % in La Liga", fontsize=14)
 plt.xlabel("Win Percentage")
 plt.tight_layout()
-plt.savefig("home_win_percentage.png")
-plt.show()
+plt.savefig("assets/home_win_percentage.png")
 print("Chart 3 saved!")

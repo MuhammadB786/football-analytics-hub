@@ -6,10 +6,16 @@ import requests
 import os
 from dotenv import load_dotenv
 
+import demo_data
+
 load_dotenv()
 API_KEY = os.getenv("FOOTBALL_API_KEY")
 BASE_URL = "https://api.football-data.org/v4"
 HEADERS = {"X-Auth-Token": API_KEY}
+
+# No API key? Fall back to the bundled 30-season La Liga dataset so the app is still
+# fully explorable. Set DEMO_MODE=1 to force it even when a key is present.
+DEMO_MODE = os.getenv("DEMO_MODE") == "1" or not API_KEY
 
 # --- LEAGUE CONFIG ---
 LEAGUES = {
@@ -91,7 +97,9 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600&display=swap');
     .stApp { background-color: #0a0a0f; color: #ffffff; }
-    .main-title { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 6px; line-height: 1; margin-bottom: 0; }
+    header[data-testid="stHeader"] { background: transparent; }
+    .title-block { margin: 0 0 2px 0; }
+    .main-title { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 6px; line-height: 0.92; margin: 0; }
     .sub-title { font-family: 'Inter', sans-serif; font-weight: 300; font-size: 13px; color: #666; letter-spacing: 6px; text-transform: uppercase; margin-top: 4px; }
     .section-header { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #ffffff; letter-spacing: 3px; border-bottom: 1px solid #222; padding-bottom: 6px; margin: 28px 0 14px 0; }
     div[data-testid="stMetric"] { background: linear-gradient(135deg, #111118, #1a1a28); border: 1px solid #222; border-left: 3px solid #A50044; border-radius: 8px; padding: 16px 20px; }
@@ -109,38 +117,48 @@ st.markdown("""
 # --- API FUNCTIONS ---
 @st.cache_data(ttl=300)
 def get_standings(league_id):
+    if DEMO_MODE:
+        return demo_data.standings(league_id)
     try:
         r = requests.get(f"{BASE_URL}/competitions/{league_id}/standings", headers=HEADERS, timeout=10)
         return r.json() if r.status_code == 200 else None
-    except:
+    except Exception:
         return None
 
 @st.cache_data(ttl=300)
 def get_matches(league_id):
+    if DEMO_MODE:
+        return demo_data.matches(league_id)
     try:
         r = requests.get(f"{BASE_URL}/competitions/{league_id}/matches?status=FINISHED&limit=20", headers=HEADERS, timeout=10)
         return r.json() if r.status_code == 200 else None
-    except:
+    except Exception:
         return None
 
 @st.cache_data(ttl=300)
 def get_scorers(league_id):
+    if DEMO_MODE:
+        return demo_data.scorers(league_id)
     try:
         r = requests.get(f"{BASE_URL}/competitions/{league_id}/scorers?limit=10", headers=HEADERS, timeout=10)
         return r.json() if r.status_code == 200 else None
-    except:
+    except Exception:
         return None
 
 @st.cache_data(ttl=300)
 def get_upcoming(league_id):
+    if DEMO_MODE:
+        return demo_data.upcoming(league_id)
     try:
         r = requests.get(f"{BASE_URL}/competitions/{league_id}/matches?status=SCHEDULED&limit=10", headers=HEADERS, timeout=10)
         return r.json() if r.status_code == 200 else None
-    except:
+    except Exception:
         return None
 
 @st.cache_data(ttl=300)
 def get_team_matches(team_id):
+    if DEMO_MODE:
+        return demo_data.team_matches(team_id)
     try:
         r = requests.get(f"{BASE_URL}/teams/{team_id}/matches?status=FINISHED&limit=100", headers=HEADERS, timeout=10)
         if r.status_code == 200:
@@ -152,11 +170,13 @@ def get_team_matches(team_id):
                 and m.get("score", {}).get("fullTime", {}).get("away") is not None
             ]
         return None
-    except:
+    except Exception:
         return None
 
 @st.cache_data(ttl=300)
 def get_h2h(team1_id, team2_id):
+    if DEMO_MODE:
+        return demo_data.h2h(team1_id, team2_id)
     try:
         r = requests.get(f"{BASE_URL}/teams/{team1_id}/matches?status=FINISHED&limit=100", headers=HEADERS, timeout=10)
         if r.status_code == 200:
@@ -169,21 +189,34 @@ def get_h2h(team1_id, team2_id):
                 and m.get("score", {}).get("fullTime", {}).get("away") is not None
             ]
         return None
-    except:
+    except Exception:
         return None
 
 @st.cache_data
 def load_historical():
     try:
         return pd.read_csv("LaLiga_Matches.csv")
-    except:
+    except Exception:
         return None
 
 
 # --- HEADER ---
-st.markdown('<p class="main-title" style="color:#A50044;">FOOTBALL</p>', unsafe_allow_html=True)
-st.markdown('<p class="main-title" style="color:#ffffff; margin-top:-16px;">ANALYTICS HUB</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Live data · Team deep dive · All competitions · Built by Muhammad Mustafa</p>', unsafe_allow_html=True)
+st.markdown('''
+<div class="title-block">
+  <p class="main-title" style="color:#A50044;">FOOTBALL</p>
+  <p class="main-title" style="color:#ffffff;">ANALYTICS HUB</p>
+  <p class="sub-title">Live data · Team deep dive · All competitions · Built by Muhammad Mustafa</p>
+</div>
+''', unsafe_allow_html=True)
+if DEMO_MODE:
+    st.info(
+        f"**Demo mode — no API key set.** Every figure below is computed live from the bundled "
+        f"`LaLiga_Matches.csv`: {len(demo_data._df()):,} real La Liga results, 1995-96 to "
+        f"{demo_data.latest_season()}. Top scorers and upcoming fixtures need the live API "
+        f"(a results archive has no player or future-fixture data) and are disabled here. "
+        f"Add a free key from football-data.org to `.env` for live data across all six competitions."
+    )
+
 st.markdown("<br>", unsafe_allow_html=True)
 
 tab1, tab2 = st.tabs(["🌍 Live League Data", "📊 Team Deep Dive"])
@@ -197,7 +230,7 @@ with tab1:
     league_id = LEAGUES[selected_league_name]["id"]
     st.markdown("<br>", unsafe_allow_html=True)
 
-    col_s, col_m, col_sc = st.columns([2, 2, 1])
+    col_s, col_m, col_sc = st.columns([2.4, 2, 1])
 
     with col_s:
         st.markdown('<p class="section-header">STANDINGS</p>', unsafe_allow_html=True)
@@ -209,7 +242,7 @@ with tab1:
                 for entry in table:
                     rows.append({
                         "#": entry["position"],
-                        "Team": entry["team"]["name"],
+                        "Team": entry["team"].get("shortName") or entry["team"]["name"],
                         "P": entry["playedGames"],
                         "W": entry["won"],
                         "D": entry["draw"],
@@ -219,9 +252,13 @@ with tab1:
                         "GD": entry["goalDifference"],
                         "Pts": entry["points"],
                     })
-                st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True, height=600)
+                # tall enough for a full 20-team table, so Pts is never scrolled out of view
+                st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True,
+                             height=36 * len(rows) + 3)
             except Exception as e:
                 st.error(f"Could not parse standings: {e}")
+        elif DEMO_MODE:
+            st.info("Demo mode covers La Liga only — switch the selector to La Liga, or add an API key for the other five competitions.")
         else:
             st.warning("Could not load standings. API limit may be reached.")
 
@@ -247,8 +284,10 @@ with tab1:
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
-                except:
+                except Exception:
                     continue
+        elif DEMO_MODE:
+            st.info("La Liga only in demo mode.")
         else:
             st.warning("Could not load recent matches.")
 
@@ -272,8 +311,10 @@ with tab1:
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
-                except:
+                except Exception:
                     continue
+        elif DEMO_MODE:
+            st.info("Player-level data is not in the historical dataset — needs the live API.")
         else:
             st.warning("Could not load scorers.")
 
@@ -295,13 +336,18 @@ with tab1:
                         <div style="font-family:'Inter'; font-size:12px; color:#ccc;">{away}</div>
                     </div>
                     """, unsafe_allow_html=True)
-            except:
+            except Exception:
                 continue
+    elif DEMO_MODE:
+        st.info("Future fixtures are not in the historical dataset — needs the live API.")
     else:
         st.info("No upcoming fixtures found.")
 
     st.markdown('<p class="section-header">ALL-TIME HEAD-TO-HEAD — ALL COMPETITIONS</p>', unsafe_allow_html=True)
-    st.caption("Covers La Liga, Champions League, Copa del Rey & more — powered by live API")
+    st.caption(
+        "Every league meeting in the bundled dataset, 1995-96 onward" if DEMO_MODE
+        else "Covers La Liga, Champions League, Copa del Rey & more — powered by live API"
+    )
 
     team_names = sorted(list(TEAM_IDS.keys()))
     h2h_col1, h2h_col2 = st.columns(2)
@@ -357,13 +403,15 @@ with tab1:
                         "A": int(m["score"]["fullTime"]["away"]),
                         "Away": m["awayTeam"].get("shortName") or m["awayTeam"]["name"],
                     })
-                except:
+                except Exception:
                     continue
             if rows:
                 st.markdown("##### Complete Match History")
                 st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
         elif h2h_matches is not None:
             st.info(f"No finished matches found between {h2h_team1} and {h2h_team2}.")
+        elif DEMO_MODE:
+            st.info("Demo mode has head-to-head history for La Liga clubs only. Try Barcelona vs Real Madrid.")
         else:
             st.warning("Could not load H2H data. API limit may be reached.")
     else:
@@ -375,7 +423,10 @@ with tab1:
 # ================================================================
 with tab2:
     st.markdown('<p class="section-header">TEAM DEEP DIVE — ALL COMPETITIONS</p>', unsafe_allow_html=True)
-    st.caption("Full match history across La Liga, Champions League, Copa del Rey, Premier League & more")
+    st.caption(
+        "La Liga match history from the bundled dataset, 1995-96 onward" if DEMO_MODE
+        else "Full match history across La Liga, Champions League, Copa del Rey, Premier League & more"
+    )
 
     team_names = sorted(list(TEAM_IDS.keys()))
     col_team_sel, col_comp_filter = st.columns([1, 1])
@@ -386,7 +437,10 @@ with tab2:
         all_matches = get_team_matches(TEAM_IDS[selected_team])
 
     if not all_matches:
-        st.warning("Could not load team data. API limit may be reached — try again in a minute.")
+        if DEMO_MODE:
+            st.info("Demo mode has match history for La Liga clubs only — pick a Spanish side such as FC Barcelona, Real Madrid CF or Sevilla FC.")
+        else:
+            st.warning("Could not load team data. API limit may be reached — try again in a minute.")
     else:
         comps = sorted(set(m["competition"]["name"] for m in all_matches))
         with col_comp_filter:
@@ -447,7 +501,9 @@ with tab2:
                 fig_comp.update_layout(
                     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                     font_color="#888", title_font_color="#fff", coloraxis_showscale=False,
-                    xaxis=dict(showgrid=False), yaxis=dict(showgrid=False), margin=dict(l=0, r=0, t=40, b=0))
+                    xaxis=dict(showgrid=False), yaxis=dict(showgrid=False), margin=dict(l=0, r=0, t=40, b=0),
+                    # keep bars a sane thickness when a team has only one or two competitions
+                    height=max(220, 90 + 60 * len(comp_df)), bargap=0.55)
                 st.plotly_chart(fig_comp, use_container_width=True)
 
             with col_right:
@@ -485,7 +541,7 @@ with tab2:
                         "Away": m["awayTeam"].get("shortName") or m["awayTeam"]["name"],
                         "Result": result,
                     })
-                except:
+                except Exception:
                     continue
             if rows:
                 st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
