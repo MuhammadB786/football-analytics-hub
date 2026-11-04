@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Football intelligence: match research, historical analysis and transparent forecasting."
+    />
+    <title>Touchline · Football Intelligence</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <aside>
+      <a class="brand" href="/"
+        >◈ <span>TOUCHLINE<small>FOOTBALL INTELLIGENCE</small></span></a
+      >
+      <div class="nav-label">WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <button data-view="overview">◫ <span>Matchday overview</span></button
+        ><button data-view="matches">◷ <span>Match center</span></button
+        ><button data-view="history">↗ <span>Historical explorer</span></button
+        ><button data-view="teams">◎ <span>Club intelligence</span></button
+        ><button data-view="forecast">⌁ <span>Forecast lab</span></button
+        ><button data-view="simulation">⤨ <span>Season simulator</span></button
+        ><button data-view="players">♙ <span>Player leaders</span></button
+        ><button data-view="status">⊙ <span>Data & reliability</span></button>
+      </nav>
+      <div class="aside-bottom">
+        <span class="dot"></span> Evidence over opinion.
+        <p>Real results. Clear provenance.<br />Models you can inspect.</p>
+        <small>FOOTBALL ANALYTICS HUB / V2</small>
+      </div>
+    </aside>
+    <div class="shell">
+      <header>
+        <div class="breadcrumb">
+          Workspace <span>/</span> <b id="crumb">Overview</b>
+        </div>
+        <div class="selectors">
+          <label
+            >Competition<select id="competition">
+              <option value="PD">La Liga</option>
+              <option value="PL">Premier League</option>
+            </select></label
+          ><label>Season<select id="season"></select></label
+          ><button id="refresh" class="icon-button" aria-label="Refresh data">
+            ↻
+          </button>
+        </div>
+      </header>
+      <main id="main" tabindex="-1">
+        <div id="notice" role="status"></div>
+        <div id="content" aria-live="polite"><p>Loading the archive…</p></div>
+      </main>
+      <footer>
+        <span
+          >TOUCHLINE
+          <span class="muted">/ Football, in perspective.</span></span
+        ><span>Sources: football-data.org · bundled La Liga archive</span>
+      </footer>
+    </div>
+  </body>
+</html>

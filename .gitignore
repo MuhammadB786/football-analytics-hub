@@ -5,3 +5,7 @@ __pycache__/
 *.pyc
 .streamlit/secrets.toml
 .DS_Store
+data/*.sqlite*
+data/backups/
+node_modules/
+*.log

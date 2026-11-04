@@ -1,0 +1,18 @@
+# Applying this Blueprint creates billable infrastructure. Review the plan first.
+services:
+  - type: web
+    name: touchline-football-intelligence
+    runtime: docker
+    plan: 0.5c-512mb
+    healthCheckPath: /api/health
+    disk:
+      name: football-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: DB_PATH
+        value: /app/data/football.sqlite
+      - key: FOOTBALL_API_KEY
+        sync: false

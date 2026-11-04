@@ -1,0 +1,82 @@
+{
+  "model": "poisson-shrinkage-v1",
+  "startSeason": "2023-24",
+  "cutoff": "Strictly prior match dates",
+  "modelMetrics": {
+    "matches": 860,
+    "logLoss": 0.9765422623523027,
+    "brier": 0.5805438821943513,
+    "accuracy": 0.5406976744186046
+  },
+  "baselineMetrics": {
+    "matches": 860,
+    "logLoss": 1.0742249655080434,
+    "brier": 0.6498083707767089,
+    "accuracy": 0.44302325581395346
+  },
+  "calibration": [
+    {
+      "bin": "0–10%",
+      "count": 39,
+      "predicted": 0.08112347866682336,
+      "observed": 0.07692307692307693
+    },
+    {
+      "bin": "10–20%",
+      "count": 310,
+      "predicted": 0.16293551457121372,
+      "observed": 0.11935483870967742
+    },
+    {
+      "bin": "20–30%",
+      "count": 1069,
+      "predicted": 0.2566345398407253,
+      "observed": 0.2609915809167446
+    },
+    {
+      "bin": "30–40%",
+      "count": 460,
+      "predicted": 0.34384358921150093,
+      "observed": 0.3065217391304348
+    },
+    {
+      "bin": "40–50%",
+      "count": 324,
+      "predicted": 0.4461936688210508,
+      "observed": 0.4783950617283951
+    },
+    {
+      "bin": "50–60%",
+      "count": 213,
+      "predicted": 0.5479616222743277,
+      "observed": 0.5539906103286385
+    },
+    {
+      "bin": "60–70%",
+      "count": 104,
+      "predicted": 0.6432935465951697,
+      "observed": 0.7115384615384616
+    },
+    {
+      "bin": "70–80%",
+      "count": 54,
+      "predicted": 0.7388987277240686,
+      "observed": 0.8518518518518519
+    },
+    {
+      "bin": "80–90%",
+      "count": 7,
+      "predicted": 0.8185951860632105,
+      "observed": 1
+    },
+    {
+      "bin": "90–100%",
+      "count": 0,
+      "predicted": null,
+      "observed": null
+    }
+  ],
+  "competition": "PD",
+  "source": "Bundled La Liga archive",
+  "dataThrough": "2025-10-27"
+}

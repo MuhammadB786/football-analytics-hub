@@ -1,126 +1,91 @@
-# Football Analytics Hub
+# Touchline · Football Analytics Hub
 
-A Streamlit dashboard that puts live league data and 31 seasons of La Liga history in the same
-place — standings, results, head-to-head records and per-team deep dives across six European
-competitions.
+A football intelligence workspace for match research, historical exploration and transparent forecasting. A custom responsive frontend sits on a persistent data service with unattended provider ingestion.
 
-**It runs with no API key.** Clone it, `streamlit run dashboard.py`, and the app falls back to the
-bundled dataset of **11,664 real La Liga matches (1995-96 → 2025-26)** and computes everything —
-league table, form, head-to-head, team history — from that. Add a free key when you want live data.
+**Development release:** historical features work immediately. Live updates require a private football-data.org key and an always-on host with durable storage. Advanced event/scouting analytics are not connected yet. [Exact delivery status](docs/DELIVERY.md).
 
-![Live league data](assets/dashboard-live.png)
+## Run
 
----
+Requires **Node.js 24+**. No npm runtime dependencies.
 
-## What it does
-
-**Tab 1 — Live League Data**
-
-- Full league table for La Liga, Premier League, Bundesliga, Serie A, Ligue 1 or the Champions League
-- Latest results and upcoming fixtures as scorecards
-- Top scorers for the selected competition
-- **All-time head-to-head** between any two of 58 mapped clubs — wins/draws/losses, a comparison
-  bar, and the complete match list. Barcelona vs Real Madrid in the bundled data: **27–14–20 across
-  61 league meetings.**
-
-**Tab 2 — Team Deep Dive**
-
-- Seven headline metrics for any club: matches, W/D/L, win rate, goals scored, goal difference
-- Goals broken down by competition, filterable
-- Match-outcome donut and a sortable recent-match table
-
-![Team deep dive](assets/dashboard-deepdive.png)
-
-## Demo mode
-
-`demo_data.py` rebuilds the exact payload shapes the live API returns, straight from
-`LaLiga_Matches.csv`, so every view keeps working offline:
-
-| View | Offline source |
-|------|----------------|
-| Standings | League table recomputed from the current season's results — points, GD, ordering, the lot |
-| Recent results | Last 20 finished matches |
-| Head-to-head | Every league meeting between the two clubs, 1995-96 onward |
-| Team deep dive | That club's full match history (1,158 matches for Barcelona) |
-| Top scorers, upcoming fixtures | **Disabled, with a message saying why** — a results archive has no player or future-fixture data |
-
-Nothing is fabricated to fill a gap: where the historical dataset genuinely cannot answer, the app
-says so rather than inventing a plausible-looking number. Demo mode turns on automatically when no
-key is present, or explicitly with `DEMO_MODE=1`.
-
-## Run it
-
-```bash
+```sh
 git clone https://github.com/MuhammadB786/football-analytics-hub.git
 cd football-analytics-hub
-pip install -r requirements.txt
-streamlit run dashboard.py          # demo mode — works immediately
+npm start
 ```
 
-For live data, get a free key at [football-data.org](https://www.football-data.org/client/register):
+Open **http://localhost:3000**. The first start imports **11,664 La Liga results** into SQLite. Coverage: **September 2, 1995–October 27, 2025**, with a partial final season. It is labeled as historical rather than live.
 
-```bash
-cp .env.example .env
-# then put your key in FOOTBALL_API_KEY
-streamlit run dashboard.py
+For live updates, copy `.env.example` to `.env`, privately set `FOOTBALL_API_KEY`, restart, then verify a successful ingestion under **Data & reliability**. Subscription restrictions apply; the provider's free plan has delayed scores. Never commit `.env` or expose a key in a browser URL.
+
+## Workspace
+
+| Area                | Implemented behavior                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| Overview            | Results-derived standings, recent fixtures, favorites and Elo ratings                              |
+| Match center        | Shareable match pages, date-cutoff forecasts, provider goals and lineups where supplied            |
+| Historical explorer | Club/opponent/season filters, chart tooltips, shareable queries and CSV export                     |
+| Club intelligence   | Win rates, goal difference, season points-per-game trends and recorded history                     |
+| Forecast lab        | Poisson score distributions, shrinkage, outcome probabilities, calibration and baseline evaluation |
+| Season simulator    | 1,000 seeded simulations, fixture score override, title/top-four/bottom-three rank probabilities   |
+| Player leaders      | Provider scoring leaderboard; absent data is explicitly unavailable                                |
+| Data & reliability  | Archive boundaries, provider configuration, sync status, freshness and coverage limits             |
+
+Season simulations require remaining scheduled fixtures. The bundled archive has completed results only. Player minutes, shot-based xG, shot maps and passing networks are not inferred from scores.
+
+## Automatic ingestion
+
+The service starts a serialized background loop independently of visitors. It reconciles current La Liga and Premier League fixtures, results, standings and scorers, discovering season rollovers through provider current-season endpoints. Validated match batches commit atomically; provider records supersede corresponding archive fixtures.
+
+Polling targets are **60 seconds near live/pending matches** and **15 minutes otherwise**, plus request duration. Requests are spaced at least 6.5 seconds apart, with timeout and bounded retry/backoff. Failed runs retain existing data. These are design targets, not measured production latency or uptime.
+
+The supported deployment is one process and one durable SQLite volume. An always-running host is required for unattended updates.
+
+## Model evidence
+
+`npm run evaluate` regenerates [reports/evaluation.json](reports/evaluation.json) from the bundled archive.
+
+| Walk-forward metric | Poisson model | Historical-frequency baseline |
+| ------------------- | ------------: | ----------------------------: |
+| Held-out matches    |           860 |                           860 |
+| Log loss ↓          |         0.977 |                         1.074 |
+| Multiclass Brier ↓  |         0.581 |                         0.650 |
+| Outcome accuracy    |         54.1% |                         44.3% |
+
+Evaluation begins in 2023-24 and ends at the archive boundary. Every prediction excludes results on or after its match date. The baseline uses expanding historical home/draw/away frequencies. This is one retrospective La Liga evaluation, not evidence of future performance or a Premier League evaluation. [Model assumptions](docs/ARCHITECTURE.md).
+
+## Verify and deploy
+
+```sh
+npm test
+npm run evaluate
+node --check public/app.js
 ```
 
-The free tier covers the six competitions above and is rate-limited to 10 requests/minute — all API
-calls are cached for 5 minutes (`st.cache_data(ttl=300)`) to stay inside it.
+Tests cover points/goals invariants, probability normalization, atomic rollback, corrected upserts, archive/live deduplication, provider retries, outage persistence, scheduling, seeded simulation, temporal leakage and HTTP behavior. GitHub Actions runs verification and reproducible evaluation.
 
-## Historical analysis script
+The [Dockerfile](Dockerfile) uses a non-root runtime and health check. Mount `/app/data` on persistent storage and set the key as a runtime secret. [Operating runbook](docs/OPERATIONS.md) · [Data and hosting options](docs/PROVIDERS.md).
 
-`analyzer.py` is a standalone pandas pass over the dataset — Barcelona's all-time record, top
-scoring teams, the Clásico ledger, best scoring seasons, and home advantage by club (the league
-average home win rate across all 11,664 matches is **47.2%**). It writes three matplotlib charts
-into `assets/`:
+No production host, subscription, incident notifications or backups have been activated. Do not use an ephemeral filesystem or multiple ingestion replicas with this SQLite architecture.
 
-```bash
-python analyzer.py
+## Source map
+
+```text
+src/analytics.js      standings, Elo, Poisson, evaluation, simulations
+src/store.js          SQLite schema, validated import and upserts
+src/provider.js       adapter, retries, reconciliation, scheduling
+src/server.js         HTTP application and worker lifecycle
+public/               responsive browser interface
+test/                 analytical, ingestion and HTTP checks
+reports/evaluation.json  reproducible historical model evaluation
+docs/                 architecture, operations and delivery status
 ```
 
-| | | |
-|---|---|---|
-| ![Clásico record](assets/clasico_record.png) | ![Barcelona goals per season](assets/barca_goals_per_season.png) | ![Home win percentage](assets/home_win_percentage.png) |
+Original Python/Streamlit entry points remain available: [legacy instructions](docs/LEGACY_STREAMLIT.md).
 
-## Tech
+## Attribution and coverage
 
-| | |
-|---|---|
-| **App** | Streamlit — tabs, columns, metrics, cached data functions, custom dark CSS |
-| **Data** | pandas for the historical dataset; football-data.org v4 REST API for live data |
-| **Charts** | Plotly (interactive, in-app) and matplotlib (static, for the analysis script) |
-| **Config** | `python-dotenv`; the key lives in `.env`, which is gitignored |
-| **Offline layer** | `demo_data.py` — reconstructs API-shaped responses from the CSV |
+Live data: [football-data.org](https://www.football-data.org/). Historical data: this repository's existing Kaggle-sourced La Liga CSV; the precise upstream URL/version and redistribution terms still need documentation. Computed standings do not implement all official tie-breakers or disciplinary deductions. Records are described by actual coverage, without an all-time completeness claim.
 
-## Repo layout
-
-```
-dashboard.py           Streamlit app — the main deliverable
-demo_data.py           Offline data layer, API-shaped, built from the CSV
-analyzer.py            Standalone historical analysis → three charts
-LaLiga_Matches.csv     11,664 La Liga results, 1995-96 to 2025-26
-assets/                Screenshots and generated charts
-.env.example           Config template
-```
-
-## Deploy
-
-Free on [Streamlit Community Cloud](https://share.streamlit.io): point it at this repo and
-`dashboard.py`. It will run in demo mode out of the box; to serve live data, add
-`FOOTBALL_API_KEY = "..."` under **Settings → Secrets**.
-
-## Roadmap
-
-- [ ] xG and shot data (the free API tier has neither)
-- [ ] Season-over-season trend view in the deep dive, not just career totals
-- [ ] A simple match-outcome model trained on the historical set, scored against held-out seasons
-- [ ] Cache the API responses to disk so the app survives rate limiting
-
-## Author
-
-**Muhammad Mustafa** — Computer Science, Montclair State University
+**Muhammad Mustafa** · Computer Science, Montclair State University
 [GitHub](https://github.com/MuhammadB786) · [LinkedIn](https://linkedin.com/in/muhammad-mustafa)
-
-Match data © [football-data.org](https://www.football-data.org/). Historical La Liga dataset sourced
-from Kaggle.
