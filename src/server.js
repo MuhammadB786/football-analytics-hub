@@ -11,6 +11,7 @@ import {
   simulateSeason,
 } from "./analytics.js";
 import { FootballProvider, sync, nextInterval } from "./provider.js";
+import { research, audit } from "./research.js";
 
 export function canonicalRows(store) {
   const rows = store.all(),
@@ -119,6 +120,20 @@ export function createApp(store) {
               JSON.stringify({ error: "Match not found in this competition" }),
             );
           }
+        } else if (url.pathname === "/api/research") {
+          try {
+            result = research(rows, {
+              team: url.searchParams.get("team"),
+              opponent: url.searchParams.get("opponent") || "",
+              from: url.searchParams.get("from") || "",
+              to: url.searchParams.get("to") || "9999",
+            });
+          } catch (e) {
+            res.writeHead(400);
+            return res.end(JSON.stringify({ error: e.message }));
+          }
+        } else if (url.pathname === "/api/audit") {
+          result = audit(finished(rows));
         } else if (url.pathname === "/api/history") {
           const team = url.searchParams.get("team"),
             opponent = url.searchParams.get("opponent"),
@@ -230,6 +245,9 @@ export function createApp(store) {
         "/": "index.html",
         "/app.js": "app.js",
         "/simulation.js": "simulation.js",
+        "/studio.js": "studio.js",
+        "/audit.js": "audit.js",
+        "/studio.css": "studio.css",
         "/style.css": "style.css",
       };
       const name = files[url.pathname];

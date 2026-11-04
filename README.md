@@ -20,6 +20,8 @@ For live updates, copy `.env.example` to `.env`, privately set `FOOTBALL_API_KEY
 
 ## Workspace
 
+The **Research studio** works without a subscription on the bundled archive. Select a club, opponent and period; inspect calculated claims; export landscape/square PNG graphics, a caption and a JSON evidence ledger. Each graphic includes the sample size, date range, source and an evidence fingerprint. A cross-era attack index normalizes club scoring against its available league season. The data reliability view reports invalid records, duplicate fixtures and round-robin count diagnostics. Internal checks do not independently verify every score or establish data publication rights.
+
 | Area                | Implemented behavior                                                                               |
 | ------------------- | -------------------------------------------------------------------------------------------------- |
 | Overview            | Results-derived standings, recent fixtures, favorites and Elo ratings                              |

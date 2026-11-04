@@ -1,0 +1,57 @@
+.story-list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.story-option {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+  background: #151f26;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 17px;
+  color: var(--text);
+}
+.story-option.selected {
+  border-color: var(--green);
+  background: #1b2920;
+}
+.story-option strong {
+  font-size: 16px;
+  font-weight: 550;
+}
+#publication-card {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.fingerprint {
+  overflow-wrap: anywhere;
+}
+details {
+  margin: 18px 0;
+}
+summary {
+  cursor: pointer;
+  color: var(--green);
+}
+@media (min-width: 751px) {
+  nav {
+    gap: 2px;
+  }
+  nav button {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .nav-label {
+    margin-top: 34px;
+  }
+}

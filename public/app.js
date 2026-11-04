@@ -1,4 +1,6 @@
+import { auditPanel } from "./audit.js";
 import { simulationView } from "./simulation.js";
+import { studioView, bindStudio } from "./studio.js";
 const $ = (s) => document.querySelector(s),
   esc = (v) =>
     String(v ?? "").replace(
@@ -359,9 +361,11 @@ function players() {
     )
   );
 }
-function status() {
+async function status() {
   const h = data.health;
+  const quality = auditPanel(await api("audit"), { panel, esc });
   return (
+    quality +
     title(
       "DATA & RELIABILITY",
       "Trust starts with provenance.",
@@ -383,6 +387,7 @@ async function render() {
       history: "Historical explorer",
       teams: "Club intelligence",
       forecast: "Forecast lab",
+      studio: "Research studio",
       simulation: "Season simulator",
       players: "Player leaders",
       status: "Data & reliability",
@@ -390,32 +395,35 @@ async function render() {
   persist();
   try {
     const html =
-      view === "matches"
-        ? await matches()
-        : view === "history"
-          ? await historical()
-          : view === "teams"
-            ? await historical(true)
-            : view === "forecast"
-              ? await forecast()
-              : view === "simulation"
-                ? await simulationView({
-                    api,
-                    data,
-                    title,
-                    panel,
-                    empty,
-                    esc,
-                    pct,
-                  })
-                : view === "players"
-                  ? players()
-                  : view === "status"
-                    ? status()
-                    : overview();
+      view === "studio"
+        ? await studioView({ api, data, title, panel, empty, esc })
+        : view === "matches"
+          ? await matches()
+          : view === "history"
+            ? await historical()
+            : view === "teams"
+              ? await historical(true)
+              : view === "forecast"
+                ? await forecast()
+                : view === "simulation"
+                  ? await simulationView({
+                      api,
+                      data,
+                      title,
+                      panel,
+                      empty,
+                      esc,
+                      pct,
+                    })
+                  : view === "players"
+                    ? players()
+                    : view === "status"
+                      ? await status()
+                      : overview();
     if (token !== request) return;
     $("#content").innerHTML = html;
     activate();
+    if (view === "studio") bindStudio({ persist, render });
     if ($("#simulation-filters"))
       $("#simulation-filters").onsubmit = (e) => {
         e.preventDefault();
@@ -517,5 +525,5 @@ $("#season").onchange = load;
 $("#refresh").onclick = load;
 await load();
 setInterval(() => {
-  if (!document.hidden && !document.querySelector("form :focus")) load();
+  if (view !== 'studio' && !document.hidden && !document.querySelector("form :focus")) load();
 }, 60000);
