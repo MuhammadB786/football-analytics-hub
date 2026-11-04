@@ -1,6 +1,6 @@
 # Architecture and operating contract
 
-The v2 application is a Node 24+ service with a custom responsive browser frontend and SQLite persistence. It has no npm runtime dependencies. The original Python/Streamlit application remains available as a legacy entry point.
+The v2 application is a Node 24+ service with a custom responsive browser frontend and SQLite persistence. It has no npm runtime dependencies. The old Streamlit entry points have been removed; Git history preserves prior versions.
 
 ## Data flow
 

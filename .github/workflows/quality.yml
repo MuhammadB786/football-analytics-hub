@@ -13,6 +13,7 @@ jobs:
       - run: npm test
       - run: node --check public/app.js
       - run: node src/evaluate.js > /tmp/evaluation.json
+      - run: npm run build:demo
       - uses: actions/upload-artifact@v4
         with:
           name: forecast-evaluation

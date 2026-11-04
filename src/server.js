@@ -246,6 +246,7 @@ export function createApp(store) {
         "/app.js": "app.js",
         "/simulation.js": "simulation.js",
         "/studio.js": "studio.js",
+        "/stories.js": "stories.js",
         "/audit.js": "audit.js",
         "/studio.css": "studio.css",
         "/style.css": "style.css",

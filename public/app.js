@@ -1,6 +1,13 @@
 import { auditPanel } from "./audit.js";
 import { simulationView } from "./simulation.js";
 import { studioView, bindStudio } from "./studio.js";
+import {storiesView} from './stories.js';
+let staticRequest;
+if(document.querySelector('meta[name="demo-mode"]')){
+  const {createStaticApi}=await import('./src/static-api.js');
+  const [archive,evaluation]=await Promise.all([fetch('./archive.json').then(r=>r.json()),fetch('./reports/evaluation.json').then(r=>r.json())]);
+  staticRequest=createStaticApi(archive,evaluation);
+}
 const $ = (s) => document.querySelector(s),
   esc = (v) =>
     String(v ?? "").replace(
@@ -48,6 +55,7 @@ function url(path, extra = {}) {
   return `/api/${path}?${q}`;
 }
 async function api(path, extra = {}) {
+  if(staticRequest)return staticRequest(path,{competition:$('#competition').value,season:$('#season').value,...extra});
   const res = await fetch(url(path, extra));
   const value = await res.json();
   if (!res.ok) throw new Error(value.error || "Request failed");
@@ -379,7 +387,7 @@ async function render() {
   $("#content").classList.add("loading");
   document
     .querySelectorAll("nav button")
-    .forEach((b) => b.classList.toggle("active", b.dataset.view === view));
+    .forEach((b) => {b.classList.toggle("active", b.dataset.view === view);if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
   $("#crumb").textContent =
     {
       overview: "Overview",
@@ -388,6 +396,7 @@ async function render() {
       teams: "Club intelligence",
       forecast: "Forecast lab",
       studio: "Research studio",
+      stories: "Example stories",
       simulation: "Season simulator",
       players: "Player leaders",
       status: "Data & reliability",
@@ -395,7 +404,7 @@ async function render() {
   persist();
   try {
     const html =
-      view === "studio"
+      view === 'stories' ? await storiesView({api,title,panel,esc}) : view === "studio"
         ? await studioView({ api, data, title, panel, empty, esc })
         : view === "matches"
           ? await matches()
@@ -421,7 +430,7 @@ async function render() {
                       ? await status()
                       : overview();
     if (token !== request) return;
-    $("#content").innerHTML = html;
+    $("#content").innerHTML = html.replaceAll('<th>','<th scope="col">');
     activate();
     if (view === "studio") bindStudio({ persist, render });
     if ($("#simulation-filters"))

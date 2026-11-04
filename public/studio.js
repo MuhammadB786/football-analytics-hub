@@ -2,6 +2,8 @@ let evidence,
   selectedFact = 0;
 const $ = (s) => document.querySelector(s);
 export async function studioView({ api, data, title, panel, empty, esc }) {
+  const preset=new URLSearchParams(location.search).get('fact');
+  if(preset!==null&&['0','1','2','3'].includes(preset))selectedFact=Number(preset);
   const q = new URLSearchParams(location.search),
     team =
       q.get("team") ||
@@ -114,6 +116,7 @@ function draw() {
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d");
+  canvas.setAttribute('aria-label',`${f.title}. ${f.headline} ${f.scope}. Source: ${evidence.provenance.sources.join(', ')}. Independent historical prototype.`);
   ctx.fillStyle = "#0b1014";
   ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = "#bcf66b";
@@ -204,7 +207,8 @@ export function bindStudio({ persist, render }) {
   $("#card-download").onclick = () => {
     $("#publication-card").toBlob((blob) => {
       if (blob) {
-        download(blob, "football-research-card.png");
+        const name=`${evidence.team}-${evidence.opponent||evidence.matches[0]?.season||'history'}-${evidence.facts[selectedFact].key}`.replace(/[^a-zA-Z0-9-]/g,'-').toLowerCase();
+        download(blob, `${name}.png`);
         $("#studio-feedback").textContent =
           "PNG exported. Review the evidence and data rights before publishing.";
       }

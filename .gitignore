@@ -8,4 +8,5 @@ __pycache__/
 data/*.sqlite*
 data/backups/
 node_modules/
+dist/
 *.log

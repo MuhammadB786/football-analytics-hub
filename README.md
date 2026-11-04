@@ -1,5 +1,9 @@
 # Touchline · Football Analytics Hub
 
+**[Try the free historical demo](https://MuhammadB786.github.io/football-analytics-hub/?view=stories)** · [Three-minute walkthrough](docs/WALKTHROUGH.md) · [Pitch pack](pitch/ONE_PAGER.md) · [Data provenance investigation](docs/DATA_PROVENANCE.md)
+
+The public demo runs entirely in the browser on GitHub Pages. It uses the same analytics and research calculations as the server and includes no credentials or live-provider connection. Build it with `npm run build:demo`; deploy `dist/` as static files. The full server remains available for future live ingestion.
+
 A football intelligence workspace for match research, historical exploration and transparent forecasting. A custom responsive frontend sits on a persistent data service with unattended provider ingestion.
 
 **Development release:** historical features work immediately. Live updates require a private football-data.org key and an always-on host with durable storage. Advanced event/scouting analytics are not connected yet. [Exact delivery status](docs/DELIVERY.md).
@@ -83,7 +87,7 @@ reports/evaluation.json  reproducible historical model evaluation
 docs/                 architecture, operations and delivery status
 ```
 
-Original Python/Streamlit entry points remain available: [legacy instructions](docs/LEGACY_STREAMLIT.md).
+The obsolete Streamlit app and its screenshots have been removed from the current tree. Earlier versions remain recoverable in Git history.
 
 ## Attribution and coverage
 
