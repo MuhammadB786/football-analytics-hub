@@ -1,6 +1,6 @@
 # Touchline · Football Analytics Hub
 
-**[Try the free historical demo](https://MuhammadB786.github.io/football-analytics-hub/?view=stories)** · [Three-minute walkthrough](docs/WALKTHROUGH.md) · [Pitch pack](pitch/ONE_PAGER.md) · [Data provenance investigation](docs/DATA_PROVENANCE.md)
+**[Try the free historical demo](https://MuhammadB786.github.io/football-analytics-hub/?view=stories)** · [Three-minute walkthrough](docs/WALKTHROUGH.md) · [Data provenance investigation](docs/DATA_PROVENANCE.md)
 
 The public demo runs entirely in the browser on GitHub Pages. It uses the same analytics and research calculations as the server and includes no credentials or live-provider connection. Build it with `npm run build:demo`; deploy `dist/` as static files. The full server remains available for future live ingestion.
 

@@ -16,7 +16,7 @@ Candidate: [Kishan's La Liga Complete Dataset](https://www.kaggle.com/datasets/k
 
 The column vocabulary agrees with [Football-Data's result-field specification](https://www.football-data.co.uk/notes.txt), including FTHG/FTAG and HTHG/HTAG. That agreement does not prove origin. Football-Data publishes [Spanish results](https://football-data.co.uk/spainm.php) and a [data-use policy](https://football-data.co.uk/contact.php). The latter surfaced in search, but direct retrieval returned HTTP 429 during this review. No new scraping, bulk downloads or commercial clearance is inferred from this investigation.
 
-The repository software license does not grant rights to third-party data, club logos, photographs or the Touchline name. No third-party logos or photographs are required by the demo. Keep the demo clearly labeled as independent and historical. Resolve the original dataset's rights or substitute a documented source before a commercial pilot or redistribution agreement. Do not promise the prospective partner exclusive ownership of the underlying results.
+The repository software license does not grant rights to third-party data, club logos, photographs or the Touchline name. No third-party logos or photographs are required by the demo. Keep the demo clearly labeled as independent and historical. Resolve the original dataset's rights or substitute a documented source before commercial use or redistribution.
 
 ## Independent spot checks
 

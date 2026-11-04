@@ -5,6 +5,6 @@
 3. **1:10–1:45 — Produce a graphic.** Select the goal or win-rate claim, change format and byline, and export PNG, caption and JSON. The graphic keeps the period, sample and source attached. The editor remains responsible for review before publication.
 4. **1:45–2:20 — Two season stories.** Open Barcelona 2014–15 and Real Madrid 2011–12. Show the primary-source cross-checks and scoring-environment index. Avoid claiming that the index adjusts for opponent strength.
 5. **2:20–2:45 — Show trust.** Open Data & reliability and Forecast lab. Show the difference between internal consistency checks, external spot checks and retrospective model evaluation.
-6. **2:45–3:00 — Ask for discovery.** Ask whether this workflow fits their editorial process and which research tasks are most time-consuming. Suggest testing a few real tasks before discussing a broader product.
+6. **2:45–3:00 — Explain the architecture.** Describe the shared analytical core behind the static demo and server, the tested calculation boundaries, and the remaining requirements for live ingestion.
 
-Use the pitch pack in `pitch/`. Publication rights, live data, hosting and commercial terms are explicit discussion items, not assumed commitments.
+The walkthrough demonstrates the portfolio project's implemented capabilities. Historical coverage, source limitations and live-data requirements should remain explicit.
