@@ -8,7 +8,30 @@ A football intelligence workspace for match research, historical exploration and
 
 **Development release:** historical features work immediately. Live updates require a private football-data.org key and an always-on host with durable storage. Advanced event/scouting analytics are not connected yet. [Exact delivery status](docs/DELIVERY.md).
 
-## Run
+## Screenshots
+
+Captured from the working historical demo. Results and forecasts shown reflect the bundled archive, which ends October 27, 2025; these are not live scores.
+
+**Desktop overview**
+
+![Desktop overview with historical standings, recent results and club strength ratings](assets/screenshots/overview-desktop.jpg)
+
+| Research studio | Historical explorer |
+| --- | --- |
+| ![Research studio showing a source-backed Barcelona scoring graphic](assets/screenshots/research-studio.jpg) | ![Historical explorer comparing Barcelona and Real Madrid across recorded seasons](assets/screenshots/historical-explorer.jpg) |
+
+**Forecast lab**
+
+![Forecast lab showing outcome probabilities, likely scorelines and held-out model evaluation](assets/screenshots/forecast-lab.jpg)
+
+<details>
+<summary>Mobile overview</summary>
+
+<img src="assets/screenshots/overview-mobile.jpg" alt="Responsive mobile overview with historical season metrics" width="300">
+
+</details>
+
+## Run the app
 
 Requires **Node.js 24+**. No npm runtime dependencies.
 
